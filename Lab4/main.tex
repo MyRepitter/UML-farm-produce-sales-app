@@ -60,6 +60,7 @@
     \item \textbf{UI (User Interface):} Пользовательский интерфейс для взаимодействия с системой;
     \item \textbf{Web:} Связывает пользовательский интерфейс с системой через интернет, используя соответствующую инфраструктуру.
 \end{enumerate}
+На диаграмме показаны составляющие элементы пакета \textbf{Online Store}: пакеты \textbf{Admin System, Login System, Order System} и \textbf{Delivery System. Admin System} взаимодействует с \textbf{Login System} для \textit{CRUD} пользователей, \textbf{Order System} и \textbf{Delivery System} взаимодействуют с \textbf{Login System} для получения информации о пользователе, \textbf{Delivery System} взаимодействует с \textbf{Order System} для получения информации о заказе. Главная по функциональности часть \textbf{Online Store} взаимодействует с пакетом графического интерфейса \textit{UI} для \textit{веб-} и \textit{мобильной} вёрстки, а также с пакетом \textit{Database}, для хранения данных.
 \subsection{Диаграмма компонентов}
 \begin{figure}[H]
     \centering
@@ -68,19 +69,19 @@
 Описание:
 \begin{enumerate}
     \item \textbf{Online Store:} основной контейнер, в который входят все компоненты системы;
-    \item \textbf{Admin System:} компонент, отвечающий за административные функции, такие как управление заказами и прочее. \begin{enumerate}
-        \item Подключен к интерфейсу \textit{ILoginSys}, отвечает за аутентификацию пользователей;
-        \item Использует интерфейс \textit{ICRUDOrder} для взаимодействия с системой управления заказами \textbf{OrderSystem}.
+    \item \textbf{Admin System:} компонент, отвечающий за административные функции. \begin{enumerate}
+        \item  Он требует интерфейс \textit{ILoginSys}, для аутентификации пользователей;
+        \item Он требует интерфейс \textit{ICRUDOrder}, взаимодействуя с системой управления заказами \textbf{OrderSystem}.
     \end{enumerate}
-    \item \textbf{Order System:} компонент, управляющий заказами. Он обрабатывает данные заказов, которые приходят от администратора или других систем. \begin{enumerate}
-        \item Связан с интерфейсом \textit{ICRUDOrder}, который предоставляет функционал для управления заказами;
-        \item Также взаимодействует с \textbf{Delivery System}, передавая информацию о заказах для их доставки.
+    \item \textbf{Order System:} компонент, управляющий заказами. \begin{enumerate}
+        \item Он предоставляет интерфейс \textit{ICRUDOrder}, предоставляет функционал для управления заказами;
+        \item Он использует компонент \textbf{Delivery System}, для получения информации о заказах для их доставки..
     \end{enumerate}
     \item \textbf{Delivery System:} Отвечает за обработку и управление доставкой заказов. \begin{enumerate}
-        \item Подключен к интерфейсу \textit{IDeliverySys}, который может представлять внешнюю систему доставки;
-        \item Получает данные о заказах из \textbf{Order System}.
+        \item Он требует интерфейс \textit{IDeliverySys}, для обмена данными о заказе;
+        \item Он используется компонентом \textbf{Order System}, для получения информации о заказах для их доставки.
     \end{enumerate}
-    \item \textbf{DataBase:} Компонент базы данных, отвечающий за хранение данных системы.
+    \item \textbf{DataBase:} Компонент базы данных, отвечающий за хранение данных системы, для записи информации о новых заказах, хранении информации о пользователе, и о самих товарах (Все компоненты \textbf{Online Store} его используют).
 \end{enumerate}
 \subsection{Диаграмма развёртывания}
 \begin{figure}[H]
@@ -89,17 +90,41 @@
 \end{figure}
 Описание:
 \begin{enumerate}
-    \item \textbf{Web Server (веб-сервер):}\begin{enumerate}
-        \item Содержит \textbf{Frontend}, предоставляющий статические ресурсы, такие как HTML, CSS и JavaScript;
-        \item Этот сервер обеспечивает доступ пользователей к системе через браузер.
+    \item \textbf{Рабочая станция пользователя (User Workstation)}\\
+    На стороне клиента используется:
+    \begin{itemize}
+        \item \textbf{Web Browser} -- среда выполнения, предназначенная для работы с интерфейсом приложения. Веб-браузер выполняет React-приложение, которое загружается с веб-сервера.
+    \end{itemize}
+    
+    \item \textbf{Веб-сервер (Web Server)}\\
+    Веб-сервер отвечает за предоставление фронтенда клиенту. Его компоненты:
+    \begin{itemize}
+        \item \textbf{Frontend (React)} -- артефакт, представляющий собой React-приложение, которое используется для пользовательского интерфейса.
+        \item \textbf{Node.js} -- среда выполнения для сборки и (при необходимости) серверного рендеринга React.
+    \end{itemize}
+    
+    \item \textbf{Сервер приложений (Application Server)}\\
+    Сервер приложений обрабатывает бизнес-логику и взаимодействует с базой данных. Компоненты сервера приложений:
+    \begin{itemize}
+        \item \textbf{Backend (Django/Express.js)} -- артефакт, представляющий серверную часть веб-приложения.
+        \item \textbf{Python Interpreter} -- среда выполнения, если сервер написан на Django.
+        \item \textbf{Node.js Runtime} -- среда выполнения, если серверная часть реализована на Express.js.
+    \end{itemize}
+    
+    \item \textbf{Сервер базы данных (Database Server)}\\
+    Сервер базы данных хранит всю информацию о продуктах, пользователях и заказах. Используется:
+    \begin{itemize}
+        \item \textbf{SQLite Database} -- встроенная база данных, не требующая отдельной среды выполнения.
+    \end{itemize}
+    
+    \item[*]\textbf{Взаимодействие между компонентами}\\
+    \begin{enumerate}
+        \item Пользователь через Web Browser отправляет HTTP-запрос на Web Server.
+        \item Web Server передаёт запрос на Application Server для обработки бизнес-логики.
+        \item Application Server отправляет SQL-запросы к SQLite Database для получения или обновления данных.
+        \item Ответ от базы данных возвращается на Application Server, а затем обратно на Web Server.
+        \item Web Server формирует и отправляет HTTP-ответ пользователю.
     \end{enumerate}
-    \item \textbf{Application Server (сервер приложений):}\begin{enumerate}
-        \item Хостит \textbf{Backend}, обрабатывающий бизнес-логику и API-запросы от фронтенда;
-        \item Этот сервер взаимодействует с базой данных для получения или изменения данных.
-    \end{enumerate}
-    \item \textbf{Database Server (сервер базы данных):}\begin{enumerate}
-        \item Хранит все данные системы, включая информацию о пользователях, заказах, товарах и доставках;
-        \item Используется для обработки запросов на чтение и запись данных от сервера приложений.
-    \end{enumerate}
-\end{enumerate}
+\end{enumerate} 
+
 \end{document}
